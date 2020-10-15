@@ -42,10 +42,14 @@ class BlogController extends Controller
     }
 
 
-    //////////////// get blogs list function
+    //////////////// get blogs list function (with related tags)
     public function getBlogs()
     {
-        $blogs = DB::table('blogs')->get();
+        $blogs = Blog::all();
+
+        foreach ($blogs as $blog) {
+            $blog->tags;
+        }
 
         return response()->json($blogs);
     }

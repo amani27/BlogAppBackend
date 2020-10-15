@@ -32,7 +32,7 @@ Route::get('/users', 'TestController@getUsers'); // to get all users list
 
 // route grouping
 Route::group(
-    ['prefix' => 'blogs'], // prfixing all routes in this group with blogs
+    ['prefix' => 'blogs'], // prefixing all routes in this group with blogs
     function () {
         Route::post('/createNewBlog', 'BlogController@createNewBlog'); //create
 

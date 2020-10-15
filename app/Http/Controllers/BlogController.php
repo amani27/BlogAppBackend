@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use DB;
 use App\Blog;
+use App\Tag;
 use Illuminate\Http\Request;
 use Validator;
 
@@ -19,7 +20,6 @@ class BlogController extends Controller
             'content' => 'required|min:10',
             'user_id' => 'required',
             'category_id' => 'required',
-            // 'category' => 'required',
         ]);
         if ($validation->fails()) {
             return response()->json([
@@ -33,43 +33,23 @@ class BlogController extends Controller
             'content' => $request->content,
             'user_id' => $request->user_id,
             'category_id'  => $request->category_id,
-            // 'category_id'  => $request->input('category.id'), // no use of this here
-            // 'category'  => [
-            //     'id' =>  $request->category_id,
-            //     'name' => $request->category_name,
-            // ],
         ]);
-        // return $blog;
+
         return response()->json([
             'success' => true,
             'post' =>  $blog
         ], 200);
     }
 
+
     //////////////// get blogs list function
     public function getBlogs()
     {
         $blogs = DB::table('blogs')->get();
 
-
         return response()->json($blogs);
     }
 
-    // //////////////// get blogs list function
-    // public function getBlogsByCategory(Request $request)
-    // {
-    //     $blogs = DB::table('blogs')->where('category_id', $request->category_id)->get();
-    //     // $category = DB::table('categories')->where('id', $request->category_id)->get();
-    //     $category = DB::table('categories')->where('id', $request->category_id)->pluck('name');
-    //     // $catDetails = array();
-
-    //     // foreach ($blogs as $b) {
-    //     //     if (DB::table('categories')->where('id', $b->category_id)->get()) array_push($catDetails, $b);
-    //     // }
-
-    //     // return response()->json(['categoryName' => $category, $blogs]);
-    //     return response()->json(['categoryName' => $category[0], 'blogs' => $blogs]);
-    // }
 
     //////////////// get blogs list function
     public function getBlogsByUserId(Request $request)
@@ -113,8 +93,6 @@ class BlogController extends Controller
 
         $isUpdatedBlog = Blog::where('id', $request->id)->update(array('title' => $request->title, 'content' => $request->content, 'category_id' => $request->category_id,));
 
-        // if ($isUpdatedBlog) $blog = Blog::where('id', $request->id);
-
         if (!$isUpdatedBlog) {
             return response()->json([
                 'success' => false,
@@ -126,29 +104,23 @@ class BlogController extends Controller
 
         $data =   [
             "id" => $blog[0]->id,
-            // "id" => $request->id,
             "title" => $blog[0]->title,
             "content" => $blog[0]->content,
             "category_id" => $blog[0]->category_id,
         ];
 
-        // return response()->json($blog);
         return response()->json([
             'success' => true,
             'post' =>  $data,
         ], 200);
     }
 
+
     //////////////// delete blog function
     public function deleteBlog(Request $request)
     {
         $id  = $request->id;
-        // return $id;
-        // $deletedBlog = Blog::where('id', $id)->delete(); // or
-        // $deletedBlog = DB::table('blogs')->delete($id); // or
         $deletedBlog = Blog::destroy($id);
-
-        // return $deletedBlog;
 
         if ($deletedBlog == 0) {
             return response()->json([
@@ -159,5 +131,33 @@ class BlogController extends Controller
         return response()->json([
             'success' => true,
         ], 200);
+    }
+
+
+    ///////////// get blogs by tag function
+    public function getBlogsByTag(Request $request)
+    {
+        $tag_id  = $request->tag_id;
+        $tag = Tag::where('id', $tag_id)->get()->first();
+        $blogs = $tag->blogs;
+
+        return response()->json($blogs);
+    }
+
+
+    ///////////// get tags by blog function
+    public function getTagsByBlog(Request $request)
+    {
+        $blog_id  = $request->blog_id;
+        // $blog = DB::table('blogs')->where('id', $blog_id)->get()->first();
+        // $blog = Blog::find($blog_id);
+        $blog = Blog::where('id', $blog_id)->get()->first();
+        $tags = $blog->tags;
+
+        // $blog = Blog::first();
+        // $tags = $blog->tags;
+
+        return response()->json($tags);
+        // return response()->json($blog);
     }
 }

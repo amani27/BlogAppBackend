@@ -35,6 +35,24 @@ class BlogController extends Controller
             'category_id'  => $request->category_id,
         ]);
 
+        //
+        if ($blog) {
+            $tagNames = explode(',', $request->get('tags'));
+            $tagIds = [];
+            foreach ($tagNames as $tagName) {
+                // $tag = $blog->tags()->create(['name' => $tagName]);
+                //Or to take care of avoiding duplication of Tag
+                //you could substitute the above line as
+                $tag = Tag::firstOrCreate(['name' => $tagName]);
+                if ($tag) {
+                    $tagIds[] = $tag->id;
+                }
+            }
+            $blog->tags()->sync($tagIds);
+        }
+        //
+        $blog->tags;
+
         return response()->json([
             'success' => true,
             'post' =>  $blog

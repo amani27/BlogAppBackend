@@ -37,13 +37,16 @@ class BlogController extends Controller
 
         //
         if ($blog) {
-            $tagNames = explode(',', $request->get('tags'));
+            // using comma separator to get tags
+            // $tagNames = explode(',', $request->get('tags'));
+            $tagNames = $request->get('tags');
             $tagIds = [];
+
             foreach ($tagNames as $tagName) {
                 // $tag = $blog->tags()->create(['name' => $tagName]);
                 //Or to take care of avoiding duplication of Tag
-                //you could substitute the above line as
                 $tag = Tag::firstOrCreate(['name' => $tagName]);
+                // if new add to db
                 if ($tag) {
                     $tagIds[] = $tag->id;
                 }
@@ -78,7 +81,6 @@ class BlogController extends Controller
     {
         $user_id  = $request->user_id;
         $blogs = DB::table('blogs')->where('user_id', $user_id)->get();
-        // $blogs = DB::table('blogs')->select(DB::raw('* WHERE user_id=$user_id'))->get();
 
         return response()->json($blogs);
     }
@@ -88,7 +90,12 @@ class BlogController extends Controller
     public function getBlogsByCategories(Request $request)
     {
         $category_id  = $request->category_id;
-        $blogs = DB::table('blogs')->where('category_id', $category_id)->get();
+        // $blogs = DB::table('blogs')->where('category_id', $category_id)->get();
+        $blogs = Blog::where('category_id', $category_id)->get();
+
+        foreach ($blogs as $blog) {
+            $blog->tags;
+        }
 
         return response()->json($blogs);
     }
@@ -162,6 +169,10 @@ class BlogController extends Controller
         $tag_id  = $request->tag_id;
         $tag = Tag::where('id', $tag_id)->get()->first();
         $blogs = $tag->blogs;
+
+        foreach ($blogs as $blog) {
+            $blog->tags;
+        }
 
         return response()->json($blogs);
     }

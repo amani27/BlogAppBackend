@@ -13,21 +13,21 @@ use Illuminate\Http\Request;
 |
 */
 
-Route::middleware('auth:api')->get('/user', function (Request $request) {
-    return $request->user();
-});
+// Route::middleware('auth:api')->get('/user', function (Request $request) {
+//     return $request->user();
+// });
 
+// test register/logiin routes
+// Route::post('/register', 'TestController@createNewUser');
 
-Route::post('/register', 'TestController@createNewUser');
+// Route::post('/updateUser/{id}', 'TestController@updateUser');
 
-Route::post('/updateUser/{id}', 'TestController@updateUser');
+// Route::post('/deleteUser/{id}', 'TestController@deleteUser');
+// // Route::delete('/deleteUser/{id}', 'TestController@deleteUser');
+// // Route::delete('/deleteUser/{id}', [ 'uses' => 'TestController@deleteUser']);
 
-Route::post('/deleteUser/{id}', 'TestController@deleteUser');
-// Route::delete('/deleteUser/{id}', 'TestController@deleteUser');
-// Route::delete('/deleteUser/{id}', [ 'uses' => 'TestController@deleteUser']);
-
-Route::get('/user/{id}', 'TestController@getUserInfo'); // to get user info by id
-Route::get('/users', 'TestController@getUsers'); // to get all users list
+// Route::get('/user/{id}', 'TestController@getUserInfo'); // to get user info by id
+// Route::get('/users', 'TestController@getUsers'); // to get all users list
 
 
 // route grouping
@@ -49,8 +49,18 @@ Route::group(
 
         Route::get('/allCategories', 'CategoryController@getCategories'); // read
 
-        
+
     }
 );
 
 Route::get('/allTagsList', 'TagController@getTags');
+
+Route::post('register', 'UserController@register');
+Route::post('login', 'UserController@authenticate');
+Route::get('open', 'DataController@open');
+
+// every route wished to secure is kept inside this JWT middleware
+Route::group(['middleware' => ['jwt.verify']], function () {
+    Route::get('user', 'UserController@getAuthenticatedUser');
+    Route::get('closed', 'DataController@closed');
+});

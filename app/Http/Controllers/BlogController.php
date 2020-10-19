@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use DB;
+use App\BlogImage;
 use App\Blog;
 use App\Tag;
 use Illuminate\Http\Request;
@@ -35,11 +36,11 @@ class BlogController extends Controller
             'category_id'  => $request->category_id,
         ]);
 
-        //
+        // adding tags & images
         if ($blog) {
             // using comma separator to get tags
-            // $tagNames = explode(',', $request->get('tags'));
-            $tagNames = $request->get('tags');
+            $tagNames = explode(',', $request->get('tags'));
+            // $tagNames = $request->get('tags');
             $tagIds = [];
 
             foreach ($tagNames as $tagName) {
@@ -52,9 +53,25 @@ class BlogController extends Controller
                 }
             }
             $blog->tags()->sync($tagIds);
+
+            $blogImages = $request->file('images');
+
+            if ($blogImages) {
+                foreach ($blogImages as $blogImage) {
+                    $extension = $blogImage->getClientOriginalExtension();
+                    $mFiles = pathinfo($blogImage->getClientOriginalName(), PATHINFO_FILENAME) . '-' . uniqid() . '.' . $extension;
+                    $blogImage->move(public_path() . '/blogImages/', $mFiles);
+
+                    BlogImage::create([
+                        'blog_id' => $blog->id,
+                        'blog_image_path' => 'blogImages/' . $mFiles,
+                    ]);
+                }
+            }
         }
         //
         $blog->tags;
+        $blog->blog_images;
 
         return response()->json([
             'success' => true,

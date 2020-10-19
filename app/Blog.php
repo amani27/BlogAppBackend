@@ -4,7 +4,7 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Blog extends Model
+class Blog extends Model 
 {
     //
     protected $fillable = [
@@ -14,5 +14,10 @@ class Blog extends Model
     public function tags()
     {
         return $this->belongsToMany('App\Tag');
+    }
+
+    public function blog_images()
+    {
+        return $this->hasMany('App\BlogImage');
     }
 }

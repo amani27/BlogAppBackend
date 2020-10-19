@@ -12,20 +12,29 @@ use Tymon\JWTAuth\Exceptions\JWTException;
 
 class UserController extends Controller
 {
+
+    //////////////////// login method
     public function authenticate(Request $request)
     {
         $credentials = $request->only('email', 'password');
 
         try {
             if (!$token = JWTAuth::attempt($credentials)) {
-                return response()->json(['success' => false, 'message' => 'invalid_credentials'], 400);
+                $user = User::where('email',  $request->input('email'))->count();
+
+                if ($user == 0) {
+                    // user doesn't exist
+                    return response()->json(['success' => false, 'message' => "User doesn't exist with this email!"], 400);
+                }
+
+                return response()->json(['success' => false, 'message' => "Password doesn't match!"], 400);
             }
         } catch (JWTException $e) {
             return response()->json(['success' => false, 'message' => 'could_not_create_token'], 500);
         }
 
         // get the user 
-        $user = Auth::user();
+        $user = JWTAuth::user();
 
         // return response()->json(compact('token', 'user')); 
         return response()->json([
@@ -35,6 +44,7 @@ class UserController extends Controller
         ], 200);
     }
 
+    //////////////////// register method
     public function register(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -67,6 +77,8 @@ class UserController extends Controller
         ], 200);
     }
 
+
+    //////////////////// get user details method
     public function getAuthenticatedUser()
     {
         try {
@@ -86,5 +98,31 @@ class UserController extends Controller
         }
 
         return response()->json(compact('user'));
+    }
+
+    ////////////////// upload image method start
+    public function uploadImage(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'image' => 'required|image:jpeg,png,jpg,gif,svg|max:2048' // validate image file input
+        ]);
+        if ($validator->fails()) {
+            return response()->json(
+                [
+                    'message' => $validator->messages()->first(),
+                    'success' => 'false'
+                ],
+                500
+            );
+        }
+
+        $img = $request->file('image')->hashName(); // set image file name
+        // $path = request()->file('image')->store('uploads', 'public');
+        request()->file('image')->move(public_path('/uploads'), $img); // move uploaded file 
+        $imgPath = "uploads/$img"; // set uploaded file path to return
+
+        return response()->json([
+            'image' => $imgPath
+        ], 200);
     }
 }

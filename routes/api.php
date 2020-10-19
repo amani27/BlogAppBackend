@@ -49,11 +49,12 @@ Route::group(
 
         Route::get('/allCategories', 'CategoryController@getCategories'); // read
 
-
     }
 );
 
 Route::get('/allTagsList', 'TagController@getTags');
+
+Route::post('uploadImage', 'UserController@uploadImage');
 
 Route::post('register', 'UserController@register');
 Route::post('login', 'UserController@authenticate');

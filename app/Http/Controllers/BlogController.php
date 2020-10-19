@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use DB;
+use App\Rating;
 use App\BlogImage;
 use App\Blog;
 use App\Tag;
@@ -87,6 +88,7 @@ class BlogController extends Controller
 
         foreach ($blogs as $blog) {
             $blog->tags;
+            $blog->blog_images;
         }
 
         return response()->json($blogs);
@@ -112,6 +114,7 @@ class BlogController extends Controller
 
         foreach ($blogs as $blog) {
             $blog->tags;
+            $blog->blog_images;
         }
 
         return response()->json($blogs);
@@ -189,6 +192,7 @@ class BlogController extends Controller
 
         foreach ($blogs as $blog) {
             $blog->tags;
+            $blog->blog_images;
         }
 
         return response()->json($blogs);
@@ -209,5 +213,60 @@ class BlogController extends Controller
 
         return response()->json($tags);
         // return response()->json($blog);
+    }
+
+    ////////////// add blog rating function
+    public function rateBlog(Request $request)
+    {
+        $validation = Validator::make($request->all(), [
+            'blog_id' => 'required',
+            'user_id' => 'required',
+            'rating' => 'required|integer|between:1,5',
+        ]);
+        if ($validation->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => $validation->errors()->first(),
+            ], 400);
+        }
+
+        $blog_id = $request->blog_id;
+        $user_id = $request->user_id;
+        $rating = $request->rating;
+
+        $blog = Blog::where('id', $blog_id)->get()->first();
+
+        // checking if blog exists
+        if (!$blog) {
+            return response()->json([
+                'message' => "Blog doesn't exist!",
+                'success' => false,
+            ], 400);
+        }
+
+        // checking if user trying to rate own blog post
+        if ($blog->user_id == $user_id) {
+            return response()->json([
+                'message' => "Can't rate own post!",
+                'success' => false,
+            ], 400);
+        }
+
+        // checking if user already rated blog post
+        $rating = Rating::firstOrCreate(['blog_id' => $blog_id, 'user_id' => $user_id], ['rating' => $rating]);
+
+        // if ($rating) {
+        if ($rating->wasRecentlyCreated === true) {
+            return response()->json([
+                // 'rating' => $rating,
+                'success' => true,
+            ], 200);
+        } else {
+            return response()->json([
+                // 'rating' => $rating,
+                'message' => 'Already rated!',
+                'success' => false,
+            ], 400);
+        }
     }
 }

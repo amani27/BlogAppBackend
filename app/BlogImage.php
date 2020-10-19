@@ -8,7 +8,7 @@ class BlogImage extends Model
 {
     //
     protected $fillable = [
-        'blog_id', 'blog_image_path', 'blog_image_caption'
+        'blog_id', 'blog_image_path'
     ];
 
     public function blog()

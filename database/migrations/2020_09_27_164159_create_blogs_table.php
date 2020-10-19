@@ -18,7 +18,7 @@ class CreateBlogsTable extends Migration
             $table->string('title');
             $table->text('content');
             $table->integer('user_id');
-            // $table->integer('category_id');
+            // $table->integer('category_id'); // created new named migration file for this
             $table->timestamps();
         });
     }

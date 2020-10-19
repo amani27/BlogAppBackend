@@ -36,6 +36,8 @@ Route::group(
     function () {
         Route::post('/createNewBlog', 'BlogController@createNewBlog'); //create
 
+        Route::post('/rateBlog', 'BlogController@rateBlog'); //create
+
         Route::get('/allBlogsList', 'BlogController@getBlogs'); // read
         Route::get('/allBlogsListByUserId/{user_id}', 'BlogController@getBlogsByUserId'); // read
         Route::get('/allBlogsByCategory/{category_id}', 'BlogController@getBlogsByCategories'); // read
@@ -54,8 +56,8 @@ Route::group(
 
 Route::get('/allTagsList', 'TagController@getTags');
 
-Route::post('uploadImage', 'UserController@uploadImage');
-Route::post('uploadMultipleImages', 'UserController@uploadMultipleImages');
+Route::post('uploadImage', 'TestController@uploadImage');
+Route::post('uploadMultipleImages', 'TestController@uploadMultipleImages');
 
 Route::post('register', 'UserController@register');
 Route::post('login', 'UserController@authenticate');

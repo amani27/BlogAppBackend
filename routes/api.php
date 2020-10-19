@@ -34,13 +34,14 @@ use Illuminate\Http\Request;
 Route::group(
     ['prefix' => 'blogs'], // prefixing all routes in this group with blogs
     function () {
-        Route::post('/createNewBlog', 'BlogController@createNewBlog'); //create
+        Route::post('/createNewBlog', 'BlogController@createNewBlog'); // create
 
-        Route::post('/rateBlog', 'BlogController@rateBlog'); //create
+        Route::post('/rateBlog', 'BlogController@rateBlog'); // create + update
 
         Route::get('/allBlogsList', 'BlogController@getBlogs'); // read
         Route::get('/allBlogsListByUserId/{user_id}', 'BlogController@getBlogsByUserId'); // read
         Route::get('/allBlogsByCategory/{category_id}', 'BlogController@getBlogsByCategories'); // read
+        Route::get('/allBlogsSortedByRating', 'BlogController@getBlogsSortedByRating'); // read
 
         Route::get('/allTagsByBlog/{blog_id}', 'BlogController@getTagsByBlog'); // read
         Route::get('/allBlogsByTag/{tag_id}', 'BlogController@getBlogsByTag'); // read

@@ -73,6 +73,7 @@ class BlogController extends Controller
         //
         $blog->tags;
         $blog->blog_images;
+        $blog->ratings;
 
         return response()->json([
             'success' => true,
@@ -116,6 +117,7 @@ class BlogController extends Controller
         foreach ($blogs as $blog) {
             $blog->tags;
             $blog->blog_images;
+            $blog->ratings;
         }
 
         return response()->json($blogs);
@@ -194,6 +196,7 @@ class BlogController extends Controller
         foreach ($blogs as $blog) {
             $blog->tags;
             $blog->blog_images;
+            $blog->ratings;
         }
 
         return response()->json($blogs);
@@ -215,6 +218,23 @@ class BlogController extends Controller
         return response()->json($tags);
         // return response()->json($blog);
     }
+
+
+    //////////////// get blogs list sorted by rating function start
+    public function getBlogsSortedByRating()
+    {
+        $blogs = Blog::orderBy('average_rating', 'DESC')->get();
+
+        foreach ($blogs as $blog) {
+            $blog->tags;
+            $blog->blog_images;
+            $blog->ratings;
+        }
+
+        return response()->json($blogs);
+    }
+    //////////////// get blogs list sorted by rating function end
+
 
     ////////////// add blog rating function
     public function rateBlog(Request $request)

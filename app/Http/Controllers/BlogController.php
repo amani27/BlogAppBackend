@@ -89,6 +89,7 @@ class BlogController extends Controller
         foreach ($blogs as $blog) {
             $blog->tags;
             $blog->blog_images;
+            $blog->ratings;
         }
 
         return response()->json($blogs);
@@ -257,10 +258,24 @@ class BlogController extends Controller
 
         // if ($rating) {
         if ($rating->wasRecentlyCreated === true) {
-            return response()->json([
-                // 'rating' => $rating,
-                'success' => true,
-            ], 200);
+            // to get  blog avg rating + rating count 
+            $blog = Blog::where('id', $request->blog_id)->get()->first();
+            $blog->ratings;
+            $avgRating = $blog->ratings->avg('rating');
+            $ratingCount = $blog->ratings->count('rating');
+
+            $isUpdatedBlog = Blog::where('id', $request->blog_id)->update(array('average_rating' => $avgRating, 'rating_count' => $ratingCount));
+
+            if ($isUpdatedBlog) {
+                return response()->json([
+                    'success' => true,
+                ], 200);
+            } else {
+                return response()->json([
+                    'message' => 'Something went wrong!',
+                    'success' => false,
+                ], 400);
+            }
         } else {
             return response()->json([
                 // 'rating' => $rating,

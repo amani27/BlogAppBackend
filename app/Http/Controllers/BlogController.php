@@ -14,6 +14,20 @@ use Validator;
 class BlogController extends Controller
 {
     //
+    ///
+    public function index()
+    {
+        $blogs = Blog::withFilters()->get();
+        foreach ($blogs as $blog) {
+            $blog->tags;
+            $blog->blog_images;
+            $blog->ratings;
+        }
+
+        return response()->json($blogs);
+    }
+    ////
+
     //////////////// craete blog function
     public function createNewBlog(Request $request)
     {
@@ -35,13 +49,15 @@ class BlogController extends Controller
             'content' => $request->content,
             'user_id' => $request->user_id,
             'category_id'  => $request->category_id,
+            'average_rating' => 0,
+            'rating_count' => 0,
         ]);
 
         // adding tags & images
         if ($blog) {
             // using comma separator to get tags
-            $tagNames = explode(',', $request->get('tags'));
-            // $tagNames = $request->get('tags');
+            // $tagNames = explode(',', $request->get('tags'));
+            $tagNames = $request->get('tags');
             $tagIds = [];
 
             foreach ($tagNames as $tagName) {
@@ -236,6 +252,20 @@ class BlogController extends Controller
     //////////////// get blogs list sorted by rating function end
 
 
+    /////////////// get Blog Details By Blog Id function start
+    public function getBlogDetailsByBlogId(Request $request)
+    {
+        $blog_id  = $request->blog_id;
+        $blog = Blog::where('id', $blog_id)->get()->first();
+        $blog->tags;
+        $blog->blog_images;
+        $blog->ratings;
+
+        return response()->json($blog);
+    }
+    /////////////// get Blog Details By Blog Id function end
+
+
     ////////////// add blog rating function
     public function rateBlog(Request $request)
     {
@@ -281,13 +311,19 @@ class BlogController extends Controller
             // to get  blog avg rating + rating count 
             $blog = Blog::where('id', $request->blog_id)->get()->first();
             $blog->ratings;
-            $avgRating = $blog->ratings->avg('rating');
+            $sumRating = $blog->ratings->sum('rating');
             $ratingCount = $blog->ratings->count('rating');
+            $avgRating = $sumRating / $ratingCount;
 
             $isUpdatedBlog = Blog::where('id', $request->blog_id)->update(array('average_rating' => $avgRating, 'rating_count' => $ratingCount));
 
             if ($isUpdatedBlog) {
                 return response()->json([
+                    'sumRating' =>  $sumRating,
+                    'ratingCount' =>  $ratingCount,
+                    'avgRating' =>  $avgRating,
+                    'blog_ratings' => $blog->ratings,
+                    // 'blog' => $blog,
                     'success' => true,
                 ], 200);
             } else {

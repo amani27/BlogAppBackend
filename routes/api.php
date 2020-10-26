@@ -42,6 +42,7 @@ Route::group(
         Route::get('/allBlogsListByUserId/{user_id}', 'BlogController@getBlogsByUserId'); // read
         Route::get('/allBlogsByCategory/{category_id}', 'BlogController@getBlogsByCategories'); // read
         Route::get('/allBlogsSortedByRating', 'BlogController@getBlogsSortedByRating'); // read
+        Route::get('/blogById/{blog_id}', 'BlogController@getBlogDetailsByBlogId'); // read
 
         Route::get('/allTagsByBlog/{blog_id}', 'BlogController@getTagsByBlog'); // read
         Route::get('/allBlogsByTag/{tag_id}', 'BlogController@getBlogsByTag'); // read
@@ -69,3 +70,5 @@ Route::group(['middleware' => ['jwt.verify']], function () {
     Route::get('user', 'UserController@getAuthenticatedUser');
     Route::get('closed', 'DataController@closed');
 });
+
+Route::get('blogs', 'BlogController@index');

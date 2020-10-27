@@ -15,16 +15,40 @@ class BlogController extends Controller
 {
     //
     ///
-    public function index()
+    public function index(Request $request)
     {
-        $blogs = Blog::withFilters()->get();
-        foreach ($blogs as $blog) {
-            $blog->tags;
-            $blog->blog_images;
-            $blog->ratings;
+        // $tagNames = explode(',', request()->input('categories'));
+        $categories = request()->input('categories');
+        $tags = request()->input('tags');
+        $rating = request()->input('rating');
+
+        $blogs = Blog::with('categories', 'tags', 'ratings');
+        if ($categories) {
+            $tempCat  = explode(',', $categories);
+            $blogs->whereIn('category_id', $tempCat);
+        }
+        if ($tags) {
+            $tempTag = explode(',', $tags);
+            $blogs->whereHas('tags', function ($q) use ($tempTag) {
+                $q->whereIn('tag_id', $tempTag);
+            });
+        }
+        if ($rating) {
+            if ($rating == 'ASC') {
+                $blogs->orderBy('average_rating', 'ASC');
+            } else {
+                $blogs->orderBy('average_rating', 'DESC');
+            }
         }
 
-        return response()->json($blogs);
+        $data  = $blogs->get();
+        // foreach ($blogs as $blog) {
+        //     $blog->tags;
+        //     $blog->blog_images;
+        //     $blog->ratings;
+        // }
+
+        return response()->json($data);
     }
     ////
 
